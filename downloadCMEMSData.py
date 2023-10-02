@@ -3,8 +3,8 @@ import motuclient
 import matplotlib.pyplot as plt
 import xarray as xr
 import numpy as np
-# import os
-# os.environ['PROJ_LIB'] = '/Users/mb/anaconda3/envs/worklab/share/proj'
+import os
+os.environ['PROJ_LIB'] = '/Users/mb/anaconda3/envs/worklab/share/proj'
 from mpl_toolkits.basemap import Basemap
 
 class MotuOptions:
@@ -34,6 +34,18 @@ def inputVar():
         print("Maaf, pilihan anda tidak tersedia. Silakan input kembali.")
         return inputVar()
 
+def productVar():
+    listVar = ["cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m", 
+               "cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m", 
+               "cmems_mod_glo_phy-so_anfc_0.083deg_P1D-m", 
+               "cmems_mod_glo_phy_anfc_0.083deg_P1D-m"]
+    
+    if (inVar == 1):
+        return listVar[0]
+
+    elif (inVar > 1 and inVar<=4):
+        return listVar[inVar-1]
+    
 def nameVar():
     listVarName = ["arus laut permukaan", "suhu permukaan laut", "salinitas permukaan laut", "tinggi paras laut"]
     
@@ -49,17 +61,17 @@ def codeVar():
 
 def downloadData():
     data_request_options_dict_manual = {
-        "service_id": "GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS",
-        "product_id": "global-analysis-forecast-phy-001-024",
-        "date_min": yStart+"-"+mStart+"-"+dStart+" 12:00:00",
-        "date_max": yEnd+"-"+mEnd+"-"+dEnd+" 12:00:00",
+        "service_id": "GLOBAL_ANALYSISFORECAST_PHY_001_024-TDS",
+        "product_id": productVar(),
+        "date_min": yStart+"-"+mStart+"-"+dStart+" 00:00:00",
+        "date_max": yEnd+"-"+mEnd+"-"+dEnd+" 23:59:59",
         "longitude_min": west,
         "longitude_max": east,
         "latitude_min": south,
         "latitude_max": north,
         "depth_min": 0.493,
         "depth_max": 0.4942,
-        "variable": Var,
+        "variable": inputVar(),
         "motu": "https://nrt.cmems-du.eu/motu-web/Motu",
         "out_dir": ".",
         "out_name": output_filename,
@@ -75,6 +87,10 @@ def varsAttrUnit():
     listVarUnit = ["m/s", "°C", "$10^{-3}$", "m"]
     return listVarUnit[inVar-1]
 
+def varsMap():
+    listVarMap = ["Blues", "RdYlBu_r", "GnBu", "RdBu_r"]
+    return listVarMap[inVar-1]
+
 USERNAME = input('Enter your username: ')
 PASSWORD = getpass.getpass('Enter your password: ')
 
@@ -87,13 +103,6 @@ Silakan pilih parameter yang akan diunduh!
 4. Tinggi muka laut
 """)
 inVar = int(input("Parameter: "))
-Var = inputVar()
-nVar = nameVar()
-cVar = codeVar()
-
-def varsMap():
-    listVarMap = ["Blues", "RdYlBu_r", "GnBu", "RdBu_r"]
-    return listVarMap[inVar-1]
 
 # Input Domain
 print("\nSilakan tentukan domain pengunduhan data!")
@@ -114,10 +123,10 @@ mEnd = str(input("Bulan: "))
 dEnd = str(input("Hari: "))
 
 ## Membaca nama file
-output_filename  = "./data/cmems_"+cVar+".daily."+yStart+mStart+yEnd+mEnd+".nc"
+output_filename  = "./data/cmems_"+codeVar()+".daily."+yStart+mStart+yEnd+mEnd+".nc"
 
 print("""
-Anda akan mengunduh data""",nVar,"""dengan informasi sebagai berikut
+Anda akan mengunduh data""",nameVar(),"""dengan informasi sebagai berikut
 Batas utara: """,str(north),"""
 Batas selatan: """,str(south),"""
 Batas barat: """,str(west),"""
@@ -130,14 +139,14 @@ confirm = input("Lanjutkan pengunduhan data? [y/n] ")
 while (confirm == 'y'):
     ## Downloading Data
     downloadData()
-    print("Pengunduhan data",nVar,"selesai!")
-    print("Nama file data Anda adalah cmems_"+cVar+".daily."+yStart+mStart+yEnd+mEnd+".nc")
+    print("Pengunduhan data",nameVar(),"selesai!")
+    print("Nama file data Anda adalah cmems_"+codeVar()+".daily."+yStart+mStart+yEnd+mEnd+".nc")
     break
 
 confirm = input("Lanjutkan pengecekan data? [y/n]")
 while (confirm == 'y'):
     ## Checking Data
-    print("Nama File : cmems_"+cVar+".daily."+yStart+mStart+yEnd+mEnd+".nc")
+    print("Nama File : cmems_"+codeVar()+".daily."+yStart+mStart+yEnd+mEnd+".nc")
     DS = xr.open_dataset(output_filename)
 
     print(DS)
@@ -213,8 +222,8 @@ while (confirm == 'y'):
         timestep = np.datetime_as_string(times[t],'h')
         plt.title(timestep)
 
-        output_file = "./out/" + cVar +"_"+ (timestep.replace('-','')) + ".png"
-        plt.savefig(output_file)
+        output_file = "./out/" + codeVar() +"_"+ (timestep.replace('-','')) + ".png"
+        plt.savefig(output_file,bbox_inches = "tight")
         plt.show()
     
     break
