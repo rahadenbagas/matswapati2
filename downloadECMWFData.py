@@ -1,8 +1,8 @@
 import cdsapi
 import shutil
 import xarray as xr
-# import os
-# os.environ['PROJ_LIB'] = '/Users/mb/anaconda3/envs/worklab/share/proj'
+import os
+os.environ['PROJ_LIB'] = '/Users/mb/anaconda3/envs/worklab/share/proj'
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import numpy as np
@@ -254,8 +254,7 @@ Silakan pilih parameter yang akan diunduh!
     var = inputVarSing()
     cVar = codeVarSing()
     nVar = nameVarSing()
-    pres = ''
-
+    pres = '0'
 else:
     # Variabel
     print("""
@@ -412,7 +411,7 @@ while (confirm == 'y'):
         plt.title(timestep)
 
         output_file = "./out/" + cVar + pres +"_"+ (timestep.replace('-','')) + ".png"
-        plt.savefig(output_file)
+        plt.savefig(output_file,bbox_inches = "tight")
         plt.show()
   
     break

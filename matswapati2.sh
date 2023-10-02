@@ -3,7 +3,7 @@ stty erase ^H
 
 printf '
 =============================================
-Selamat datang di sistem MATSWAPATI 2.0!
+Selamat datang di sistem MATSWAPATI!
 
 MATSWAPATI - Marine and Atmospheric Data
 Download and Processing Automation System
